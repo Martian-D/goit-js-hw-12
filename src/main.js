@@ -20,6 +20,17 @@ let userQuery = '';
 form.addEventListener('submit', async event => {
   event.preventDefault();
   userQuery = event.target.elements['search-text'].value.trim();
+  if (userQuery === '') {
+    iziToast.error({
+      message:
+        'Sorry, there are no images matching your search query. Please try again!',
+      color: '#ef4040',
+      messageColor: '#fff',
+      position: 'topRight',
+      maxWidth: '432px',
+    });
+    return;
+  }
   page = 1;
   clearGallery();
   hideLoadMoreButton();
@@ -39,7 +50,7 @@ form.addEventListener('submit', async event => {
       createGallery(data.hits);
       if (page * 15 >= data.totalHits) {
         hideLoadMoreButton();
-        iziToast.error({
+        iziToast.info({
           message: "We're sorry, but you've reached the end of search results.",
           color: '#ef4040',
           messageColor: '#fff',
@@ -51,7 +62,14 @@ form.addEventListener('submit', async event => {
       }
     }
   } catch (error) {
-    console.log(error);
+    iziToast.error({
+      message:
+        'Sorry, there are no images matching your search query. Please try again!',
+      color: '#ef4040',
+      messageColor: '#fff',
+      position: 'topRight',
+      maxWidth: '432px',
+    });
   } finally {
     hideLoader();
     event.target.reset();
@@ -60,6 +78,7 @@ form.addEventListener('submit', async event => {
 
 loadMoreBtn.addEventListener('click', async () => {
   page += 1;
+  hideLoadMoreButton();
   showLoader();
   try {
     const data = await getImagesByQuery(userQuery, page);
@@ -72,16 +91,25 @@ loadMoreBtn.addEventListener('click', async () => {
     });
     if (page * 15 >= data.totalHits) {
       hideLoadMoreButton();
-      iziToast.error({
+      iziToast.info({
         message: "We're sorry, but you've reached the end of search results.",
         color: '#ef4040',
         messageColor: '#fff',
         position: 'topRight',
         maxWidth: '432px',
       });
+    } else {
+      showLoadMoreButton();
     }
   } catch (error) {
-    console.log(error);
+    iziToast.error({
+      message:
+        'Sorry, there are no images matching your search query. Please try again!',
+      color: '#ef4040',
+      messageColor: '#fff',
+      position: 'topRight',
+      maxWidth: '432px',
+    });
   } finally {
     hideLoader();
   }
